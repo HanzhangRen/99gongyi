@@ -1,0 +1,225 @@
+---
+title: "有效捐赠的社会价值（下）：捐赠于个人的意义"
+author: "任含章"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{setspace}
+  - \usepackage{ctex}
+fontsize: 12pt
+---
+
+\singlespacing
+
+```{r setup, message = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(showtext)
+library(janitor)
+library(survey)
+showtext_auto()
+```
+
+\doublespacing
+
+\setlength\parindent{24pt}
+
+本文是笔者为99公益日所写的第二篇推文。上一篇文章讨论了慈善在中国历史中所扮演的角色以及我国捐赠活动近年来的一些问题与趋势，意在鼓励大家用常态化的有效捐赠来弘扬中华民族的传统文化。这篇文章将从更加微观的角度来探讨有效捐赠对于个人的意义。**如果我们想让自己手中的资源发挥最大的价值，让自己的职业生涯为社会做出最大的贡献，让自己的生活变得更加幸福，更加充实，那么有效慈善会是一个不错的选择。**
+
+# 有效捐赠能将金钱的社会价值最大化
+
+同样一笔钱用在不同的地方，创造的价值是不一样的。经济学中的边际效用递减效应，说的就是在很多情况下，对某一项目不断进行等量投入，带来的回报会越来越小。如图一所示，如果投入过量，带来的效应甚至可能是负面的。比如说人的食品消费行为。肚子空空的时候美餐一顿，当然能带来正面的回报。然而，如果食品消费达到了暴饮暴食或者是铺张浪费的程度，对个人健康、环境保护以及社会风气的影响就可能是负面的。**还不等边际效益降到小于零的时候，我们就应当思考，把钱用在其他缺乏投入的事情上是否会产生更大的价值。**
+
+\setlength\parindent{0pt}
+
+![](%E8%BE%B9%E9%99%85%E6%95%88%E7%9B%8A%E9%80%92%E5%87%8F%E6%95%88%E5%BA%94.png){width="600"}
+
+\setlength\parindent{24pt}
+
+据保守估计，中国餐饮业每年浪费的菜品价值约4600亿元，平均每人每年浪费330元左右（综合开发研究院，2021）。如果我们把这些钱捐给有需要的人，让我国1520亿元的慈善捐赠总量增加两倍（宋宗和 2021），能带来多大的正面社会效益？益盒的研究表明，如果捐对了地方，即便是有限的资金也能带来相当大的回报。比如说新奥农村综合眼病防治这样的项目（李治霖，2021），帮助一名失明人员复明，重获平均18.5年光明的成本是3335元左右。**同样是330元，我们可以用它购买几盘进不到肚里的食物，也可以用它给人带来将近两年的光明。**在这两者之间，正确的选择是显而易见的。随着经济的发展，过度消费正成为一个愈发普遍，愈发严重的社会问题。很多时候，我们应当扪心自问，花钱在自己身上是否真的能带来让自己真正满足的快乐，同样的钱花在更有需要的人身上是否能产生更大的意义。
+
+# 有效捐赠能提升职业生涯的社会效益
+
+当然，要产生最大的社会效益，我们投入的不仅仅应该是金钱，还应该是时间与精力。很多人在进入职场的时候都怀着服务社会、报效祖国的一腔热情，希望自己不但能够养家糊口，而且能够在更广的领域有所建树。那么我们如何才能将自己职业生涯的积极影响力提到最高呢？**一个行业的社会效益包含直接效益与间接效益两个重要组成部分。前者在于人们在岗位上的所作所为，而后者在于我们对工资收入的合理运用。**
+
+**许多行业整体上可以产生巨大的直接社会效益，但对于行业中的个体来说，职业生涯的直接社会效益往往是有限的。**在中国，医生是一个广受欢迎的职业，与科学家、大学教授、工程师以及律师一起排在中国最受尊重的职业前列（China.org.cn，2015）。医学家邦克（Bunker，2001）综合考虑了各项医疗服务的普及率、临床效果、以及各类伤病的发病率与死亡率，认为医疗服务让美国的人均寿命至少提升了四到五年。倘若五年这一估计同样适用于中国人，那么中国的医疗服务业所直接创造的社会效益便达到了70亿年这一天文数字。根据世界银行（World Bank，2022）2017年的数据，中国有大约277万名医生，每个医生的直接社会效益平均达到了2500个伤残调整生命年左右，说明医疗行业的正面社会效益是毋庸置疑的。
+
+\singlespacing
+
+```{r doctors}
+# Data prep
+# Get World Bank data on the density of doctors across the world. Filter for
+# data that is the most recent data and was collected in the past 10 years.
+physicians <- read.csv("physicians.csv") %>%
+  clean_names() %>%
+  pivot_longer(starts_with("x"),
+    names_to = "year",
+    names_prefix = "x",
+    values_to = "doctors",
+    values_drop_na = TRUE
+  ) %>%
+  filter(year > 2011) %>%
+  group_by(country_name) %>%
+  filter(year == max(year))
+
+# Get data on disease burden from the Institute for Health Metrics and 
+# Evaluation
+daly <- read.csv("daly.csv")
+
+# Match location names and merge data files
+physicians$country_name[which(!physicians$country_name %in% daly$location)]
+daly$location[which(!daly$location %in% physicians$country_name)]
+from <- c("Democratic People's Republic of Korea",
+  "Republic of Korea",
+  "Iran (Islamic Republic of)",
+  "Kyrgyzstan",
+  "Slovakia",
+  "Venezuela (Bolivarian Republic of)",
+  "Czechia",
+  "Egypt",
+  "Viet Nam",
+  "Republic of Moldova",
+  "United States of America",
+  "Turkey",
+  "Bolivia (Plurinational State of)",
+  "United Republic of Tanzania",
+  "Democratic Republic of the Congo",
+  "Lao People's Democratic Republic",
+  "Gambia",
+  "Bahamas",
+  "Yemen",
+  "Côte d'Ivoire",
+  "Congo",
+  "Saint Lucia",
+  "Saint Vincent and the Grenadines"
+)
+to <- c("Korea, Dem. People's Rep.",
+  "Korea, Rep.",
+  "Iran, Islamic Rep.",
+  "Kyrgyz Republic",
+  "Slovak Republic",
+  "Venezuela, RB",
+  "Czech Republic",
+  "Egypt, Arab Rep.",
+  "Vietnam",
+  "Moldova",
+  "United States",
+  "Turkiye",
+  "Bolivia",
+  "Tanzania",
+  "Congo, Dem. Rep.",
+  "Lao PDR",
+  "Gambia, The",
+  "Bahamas, The",
+  "Yemen, Rep.",
+  "Cote d'Ivoire",
+  "Congo, Rep.",
+  "St. Lucia",
+  "St. Vincent and the Grenadines"
+)
+match <- function(from, to) {
+  daly$location[daly$location == from] <<- to
+}
+walk2(from, to, match)
+doctors <- inner_join(daly, physicians, 
+                      by = c("location" = "country_name")) %>% 
+  mutate(val = val / 100000)
+```
+
+```{r doctors_graph}
+# Plot the concentration of doctors against disease burden
+doctors %>%
+  ggplot(aes(x = doctors, y = val, color = location)) +
+  geom_point() +
+  scale_color_manual(
+    labels = c("China" = "中国"),
+    breaks = "China",
+    values = rep("Red", nrow(doctors))
+  ) +
+  labs(
+    title = "图二：各地医生密度vs.伤病负担",
+    x = "每千人医生数", y = "人均每年伤病负担（伤残调整寿命年）",
+    color = "地区"
+  )
+```
+
+\doublespacing
+
+然而，如果我们转而考虑每一个医生个人的直接社会效益，思考这一个人对已经有277万名医生的社会产生的影响，**那么我们研究的应该是医生的边际社会效益而不是平均社会效益。**图二援引了刚刚提到的世界银行有关医生数量的数据以及华盛顿大学卫生计量与评估研究所（GHDx，2022）有关各国伤病负担的数据，试图理清世界各地医生密度与伤病负担的关系。伤病负担可以用伤残调整生命年来表述，包含了医疗服务对预期寿命的延长作用，也根据人们的主观判断折算进了伤残症状对人生活质量的影响。根据最近十年的最新数据，总体而言，似乎医生密度越大的地区伤病负担越低，但对于像中国这样医生密度已经大到一定程度的地区，两个变量的相关性就弱了许多。已有的医生已经解决了大部分可以治疗的严重伤病，而留给新增医生的发挥空间就不太多了。
+
+\singlespacing
+
+```{r doctors_model, warning = FALSE}
+# This function takes a dataset of doctor density and health burden and
+# estimate how much greater density of doctors is needed to reduce burden by 
+# 5000.
+reduce5000 <- function(data) {
+  # Model the data
+  glm <- svyglm(val ~ log(doctors), svydesign(~0, data = data, )) %>%
+    summary()
+  # To reduce burden by 5000, how much greater density of doctors do we need?
+  # What is the p value?
+  c(exp(-.1 / glm$coefficients[[2, 1]]) - 1, glm$coefficients[[2, 4]])
+}
+reduce5000_output <- reduce5000(doctors)
+reduce5000_output[[2]]
+
+# All countries with doctor density above 1
+doctors1 <- filter(doctors, doctors > 1.5)
+reduce5000_output1 <- reduce5000(doctors1)
+reduce5000_output1[[2]]
+```
+
+\doublespacing
+
+如果我们为数据拟合一条对数函数的曲线, 可以发现，如果两组典型地区的平均人均伤病负担每年相差了十分之一个伤残调整生命年，那么负担较小的地区的医生密度中位数要比负担较大地区的医生密度中位数高上大约`r round(reduce5000_output[[1]], 3)`倍（p \< 0.001）。两组地区的伤病负担越小，同样的负担差距所对应的医生密度差距就越大。中国的医生密度达到了每千人1.980名医生。**如果我们只看医生密度超过每千人1.5名医生的地区，我们甚至可以发现在这些国家中，医生密度越大的地区伤病负担越高。**如果两组典型地区的平均人均伤病负担每年相差了十分之一个伤残调整生命年，那么负担较小的地区的医生密度中位数要比负担较大地区的医生密度中位数低大约`r round(-100 * reduce5000_output1[[1]], 1)`%（p \< 0.001）。
+
+这绝对不是说医生是一个危害社会的职业。伤病负担的提高可能恰恰体现了医生对人类寿命的提高作用，而且我们使用的观察性数据并不支持因果推断。国家经济水平的发展可能同时提高了医生密度与寿命延长带来的疾病负担，这样一来医生密度便不一定会导致疾病负担的提高。但我们应该认识到的是，对于医生密度较高的国家，每个医生的边际社会效益是有限的，并不能让医生密度较高的地区产生较低的伤病负担。**真正减轻伤病负担的是数百万医生组成的医疗系统，而不是任何一个单独的医生。**此外，如果一个高考考生决定不当医生，医学院大概率并不会因此而减招一人，而是会降低分数线，招收另外一位考生，所以医生总数并不会因此改变。总之，一个医生职业生涯的直接社会效益是非常有限的。医生如此，那么很多其他的职业或许更是这样。
+
+所幸，职业生涯的直接社会效益可以由基于工资收入的间接社会效益来补充。2021年，全国居民可支配收入中位数为29975元（国家统计局，2022）。**如果一个中等收入的人能向新奥农村综合眼病防治这样的项目捐出自己年收入的百分之一，那么这些资金能换来的是一年半还多的光明。**如果你希望自己的职业生涯能够为社会作出贡献，那么将自己收入的一部分捐赠给有效的公益组织是一个不容忽视的选择。
+
+# 有效公益创造幸福人生
+
+最后，捐赠虽然不是为了自己，但适度的捐赠确实能提高个人的生活质量。史密斯与戴维森（Smith & Davidson，2014）的社会学研究表明，捐赠与志愿者活动主要可以通过九种方式让人变得更加幸福：
+
+-   达成社会使命能带来**满足感**。
+
+-   临床数据证明，这种满足感对个人**健康**有明显的正面作用。它能提高免疫力、促进心脑血管功能，防止肥胖、治疗失眠、消炎、抗胃反酸、抗红斑狼疮，抗哮喘、抗癌、还能帮助术后恢复。在帮助他人时，脑下垂体分泌的内啡肽有止痛的作用。同时，人血液中血清素的含量会升高，可以降低抑郁症等心理疾病的风险。
+
+-   即便慈善不能达成社会使命，慈善也能彰显个人的**自主性**，让人产生自豪感。
+
+-   被他人看在眼里的捐赠行为能提高人的**社会地位**。
+
+-   慈善能让人**转移注意力**，去多为别人着想，忘掉自己生活中不开心的事情。
+
+-   慈善能让人**意识到自己有多幸运**。
+
+-   部分捐赠人可以与公益工作者以及受益人沟通，**建设自己的社交网络**。
+
+-   如果捐赠人在捐赠之前对所感兴趣的领域加以研究，慈善可以成为**学习知识，锻炼自己社会能力**的机会。
+
+-   参与慈善工作有时能让人走出家门去做对健康有益的**运动**。
+
+**综上，慈善对于国家和个人来说都可以是非常有意义的行为。**笔者希望这个99公益日能吸引更多人加入有效捐赠的行列，但笔者更希望有效捐赠能够不止于9月9日这一天，而是成为国人生活的一种自然而然的习惯。
+
+# 参考资料
+
+国家统计局，2022，《2021年居民收入和消费支出情况》，北京：国家统计局。
+
+李治霖，2021，《新奥农村综合眼病防治公益项目》，北京：益盒。
+
+宋宗和，2021，《2019～2020年度中国慈善捐赠报告》，《中国慈善发展报告（2021）》，北京：社会科学文献出版社。
+
+综合开发研究院，2021，《李恩汉：平衡三重关系，《反食品浪费法》出台的重要意义》，上海：澎湃。
+
+Bunker, John P. 2001, "The Role of Medical Care in Contributing to Health Improvements Within Societies." International Journal of Epidemiology 30(6).
+
+China.org.cn 2015, "What are the most prestigious jobs in China?" Beijing: China.org.cn.
+
+GHDX (Global Health Data Exchange) 2022, "GBD Results." Seattle: Institute for Health Metrics and Evaluation, University of Washington.
+
+Smith, Beaster-Christian & Hilary Davidson 2014, The Paradox of Generosity: Giving We Receive, Grasping We Lose. Oxford: Oxford University Press.
+
+World Bank 2022, "Physicians (per 1,000 People)." Washington, DC: World Bank
